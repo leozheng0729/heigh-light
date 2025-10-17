@@ -1,6 +1,6 @@
 // import fabric from 'fabric';
 // const fabric = require('fabric').fabric;
-import { Canvas, FabricObject } from 'fabric';
+import { Canvas, FabricObject } from "fabric"
 
 /**
  * 动态计算并调整画布高度
@@ -18,9 +18,10 @@ import { Canvas, FabricObject } from 'fabric';
 
 export const calculateCanvasHeight = (): number => {
   // 页面尺寸计算
-  const bodyElement = document.body;
-  const documentElement = document.documentElement;
-  const scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+  const bodyElement = document.body
+  const documentElement = document.documentElement
+  const scrollTop =
+    document.body.scrollTop || document.documentElement.scrollTop
 
   // 获取页面总高度（取各种高度属性的最大值）
   const pageHeight = Math.max(
@@ -29,36 +30,40 @@ export const calculateCanvasHeight = (): number => {
     documentElement.clientHeight,
     documentElement.scrollHeight,
     documentElement.offsetHeight
-  );
+  )
 
-  let canvasHeight = 7500;
+  let canvasHeight = 7500
 
   // 动态调整画布高度：如果当前滚动位置+屏幕高度超过当前画布高度
   if (scrollTop + screen.height > canvasHeight) {
     // 如果当前滚动位置 + 整个屏幕高度 > 当前画布高度
     // 说明用户即将滚动到画布底部，需要扩展画布高度
-    canvasHeight += (scrollTop + screen.height) / 7500 * 7500;
+    canvasHeight += ((scrollTop + screen.height) / 7500) * 7500
   }
 
   // 确保画布高度不超过页面总高度
   if (canvasHeight > pageHeight) {
-    canvasHeight = pageHeight;
+    canvasHeight = pageHeight
   }
 
-  return canvasHeight;
+  return canvasHeight
 }
 
 const styleContent = `
+  /** 高亮画布样式 */
   #pageMarker_canvas {
-    cursor: crosshair;
+    /*cursor: crosshair;*/
     top: 0px;
     left: 0px;
-    position: absolute!important;
+    position: absolute !important;
     z-index: 2147483646;
     background-color: transparent;
-    user-select: none!important;
+    user-select: none !important;
   }
-}`;
+  #pageMarker_canvas.highlite-canvas-enabled {
+    pointer-events: none !important;
+  }
+}`
 
 /**
  * 创建并配置一个全屏可绘制的Fabric.js画布
@@ -70,19 +75,19 @@ const styleContent = `
 export const createDrawingCanvas = (
   canvasHeight: number,
   canvasId: string = "c",
-  fabricOptions: object = {},
+  fabricOptions: object = {}
 ): Canvas => {
   // 合并用户自定义配置与默认配置
   const defaultOptions = {
     isDrawingMode: true,
     width: document.body.clientWidth,
     height: canvasHeight
-  };
+  }
 
-  const mergedOptions = { ...defaultOptions, ...fabricOptions };
+  const mergedOptions = { ...defaultOptions, ...fabricOptions }
 
   // 创建画布实例
-  const canvas = new Canvas(canvasId, mergedOptions);
+  const canvas = new Canvas(canvasId, mergedOptions)
 
   // 设置全局对象属性
   // FabricObject.prototype.transparentCorners = true;
@@ -91,16 +96,16 @@ export const createDrawingCanvas = (
   canvas.setDimensions({
     width: mergedOptions.width,
     height: mergedOptions.height
-  });
+  })
 
   // 添加样式文件
-  const styleElement = document.createElement('style');
-  styleElement.textContent = styleContent;
-  document.head.appendChild(styleElement);
+  const styleElement = document.createElement("style")
+  styleElement.textContent = styleContent
+  document.head.appendChild(styleElement)
 
   // 设置包装元素ID并添加到页面
-  canvas.wrapperEl.id = "pageMarker_canvas";
-  document.body.appendChild(canvas.wrapperEl);
+  canvas.wrapperEl.id = "pageMarker_canvas"
+  document.body.appendChild(canvas.wrapperEl)
 
-  return canvas;
+  return canvas
 }

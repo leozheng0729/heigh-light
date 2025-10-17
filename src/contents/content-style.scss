@@ -1,6 +1,3 @@
-#plasmo-shadow-container {
-  z-index: 10 !important;
-}
 .plasmo-overlay {
   color:red;
   position: fixed;
@@ -8,6 +5,7 @@
   right: 20px;
   width: 300px;
   height: 20px;
+  z-index: 2147483647;
 }
 .new-tab {
   background-color: #f0f0f0;

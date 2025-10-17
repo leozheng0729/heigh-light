@@ -1,4 +1,5 @@
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo";
+import HighlightManager from './hight-light';
 import { calculateCanvasHeight, createDrawingCanvas } from "../utils";
 import cssContent from "data-text:./content-style.scss"
 import { useEffect, useState, useRef } from "react";
@@ -21,13 +22,24 @@ const PlasmoOverlay = () => {
   const [isVisible, setIsVisible] = useState(false);
   const currentLine = useRef(null);
   const isDrawingLine = useRef(false); // 正在画线
+  const isLineDrawing = useRef(false); // 可以画线
+
+  // 高亮组件
+  const highlightManager = new HighlightManager();
   
+  // 截屏函数
   const captureScreenshot = () => {
     browserAPI.runtime.sendMessage({
       type: "captureScreenshot",
       payload: {}
     });
   }
+
+  // 高亮
+  const toggleHighlighting = () => {
+    highlightManager.startHighlighting("blue");
+  }
+
 
   // 接收消息处理
   const handleMessage = (message, sender, sendResponse) => {
@@ -36,7 +48,7 @@ const PlasmoOverlay = () => {
       case 'toggleToolbar':
         if (!isVisible) {
           // 初始化 Canvas 面板
-          initCanvas();
+          // initCanvas();
         } else {
           // 去除内容
         }
@@ -67,32 +79,37 @@ const PlasmoOverlay = () => {
     myCanvas.getContext();
     // 鼠标按下事件
     myCanvas.on("mouse:down", (options) => {
-      isDrawingLine.current = true;
-      const pointer = myCanvas.getScenePoint(options.e);
-      currentLine.current = new Line([pointer.x, pointer.y, pointer.x, pointer.y], {
-        strokeWidth: 12, // 可设置线条宽度
-        fill: "#000",
-        stroke: "#000", // 可设置线条颜色
-        originX: "center",
-        originY: "center",
-        selectable: false,
-        hoverCursor: "normal",
-        targetFindTolerance: true
-      });
-      myCanvas.add(currentLine.current);
+      // 可以画线
+      if (isLineDrawing) {
+        isDrawingLine.current = true;
+        const pointer = myCanvas.getScenePoint(options.e);
+        currentLine.current = new Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+          strokeWidth: 12, // 可设置线条宽度
+          fill: "#000",
+          stroke: "#000", // 可设置线条颜色
+          originX: "center",
+          originY: "center",
+          selectable: false,
+          hoverCursor: "normal",
+          targetFindTolerance: true
+        });
+        myCanvas.add(currentLine.current);
+      }
     });
     // 鼠标移动事件
     myCanvas.on("mouse:move", (options) => {
-      if (!currentLine.current || !isDrawingLine.current) return;
-      isDrawingLine.current = true;
-      const pointer = myCanvas.getScenePoint(options.e);
-      currentLine.current.set({x2: pointer.x, y2: pointer.y});
-      myCanvas.renderAll();
+      if (isDrawingLine.current && isLineDrawing.current) {
+        const pointer = myCanvas.getScenePoint(options.e);
+        currentLine.current.set({x2: pointer.x, y2: pointer.y});
+        myCanvas.renderAll();
+      }
     });
     // 鼠标释放事件
     myCanvas.on("mouse:up", (options) => {
-      isDrawingLine.current = false;
-      currentLine.current.setCoords();
+      if (isLineDrawing.current) {
+        isDrawingLine.current = false;
+        currentLine.current.setCoords();
+      }
     });
   }
 
@@ -106,6 +123,7 @@ const PlasmoOverlay = () => {
   if (!isVisible) return null;
   return <div className="plasmo-overlay" id="pageMarker_canvas-wrapper">
     <button onClick={() => captureScreenshot()}>截屏（使用默认名称）</button>
+    <button onClick={() => toggleHighlighting()}>高亮文本</button>
   </div>
 }
 
