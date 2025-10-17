@@ -1,1 +1,1 @@
-// export * from './capture';
+export * from './canvas';

@@ -1,7 +1,8 @@
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo";
-
+import { calculateCanvasHeight, createDrawingCanvas } from "../utils";
 import cssContent from "data-text:./content-style.scss"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { Line } from 'fabric';
 
 // 浏览器API兼容性处理
 const browserAPI = globalThis.browser?.runtime?.id ? globalThis.browser : globalThis.chrome;
@@ -18,6 +19,8 @@ export const getStyle: PlasmoGetStyle = () => {
 
 const PlasmoOverlay = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const currentLine = useRef(null);
+  const isDrawingLine = useRef(false); // 正在画线
   
   const captureScreenshot = () => {
     browserAPI.runtime.sendMessage({
@@ -31,6 +34,13 @@ const PlasmoOverlay = () => {
     const { type, payload } = message;
     switch (type) {
       case 'toggleToolbar':
+        if (!isVisible) {
+          // 初始化 Canvas 面板
+          initCanvas();
+        } else {
+          // 去除内容
+        }
+        // 显示组件
         setIsVisible(prev => !prev);
         break;
       case 'preScreenshot': {
@@ -48,6 +58,44 @@ const PlasmoOverlay = () => {
     }
   }
 
+  // 画布初始化
+  const initCanvas = () => {
+    const adjustedCanvasHeight = calculateCanvasHeight();
+    const myCanvas = createDrawingCanvas(adjustedCanvasHeight, "myCanvas");
+    
+    // 获取画布上下文
+    myCanvas.getContext();
+    // 鼠标按下事件
+    myCanvas.on("mouse:down", (options) => {
+      isDrawingLine.current = true;
+      const pointer = myCanvas.getScenePoint(options.e);
+      currentLine.current = new Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+        strokeWidth: 12, // 可设置线条宽度
+        fill: "#000",
+        stroke: "#000", // 可设置线条颜色
+        originX: "center",
+        originY: "center",
+        selectable: false,
+        hoverCursor: "normal",
+        targetFindTolerance: true
+      });
+      myCanvas.add(currentLine.current);
+    });
+    // 鼠标移动事件
+    myCanvas.on("mouse:move", (options) => {
+      if (!currentLine.current || !isDrawingLine.current) return;
+      isDrawingLine.current = true;
+      const pointer = myCanvas.getScenePoint(options.e);
+      currentLine.current.set({x2: pointer.x, y2: pointer.y});
+      myCanvas.renderAll();
+    });
+    // 鼠标释放事件
+    myCanvas.on("mouse:up", (options) => {
+      isDrawingLine.current = false;
+      currentLine.current.setCoords();
+    });
+  }
+
   useEffect(() => {
     browserAPI.runtime.onMessage.addListener(handleMessage)
     return () => {
@@ -55,9 +103,8 @@ const PlasmoOverlay = () => {
     }
   }, [])
 
-
   if (!isVisible) return null;
-  return <div className="plasmo-overlay">
+  return <div className="plasmo-overlay" id="pageMarker_canvas-wrapper">
     <button onClick={() => captureScreenshot()}>截屏（使用默认名称）</button>
   </div>
 }
