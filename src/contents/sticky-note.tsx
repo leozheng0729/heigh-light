@@ -34,6 +34,8 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const noteRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  if (!note?.id) return null;
 
   useEffect(() => {
     if (isEditing && textareaRef.current) {
