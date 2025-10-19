@@ -1,7 +1,7 @@
 /**
  * 高亮管理器 - 处理文本高亮功能
  */
-const styleContent = `
+export const styleContent = `
   /** 高亮文本样式 */
   .text-highlight {
     position: relative;
@@ -56,10 +56,6 @@ export default class HighlightManager {
     // this.stateManager = stateManager
     this.highlightCounter = 0
     this.isHighlighting = false
-    // 添加样式文件
-    const styleElement = document.createElement("style")
-    styleElement.textContent = styleContent
-    document.head.appendChild(styleElement)
   }
 
   // 开始高亮模式
