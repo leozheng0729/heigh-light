@@ -15,7 +15,6 @@ interface StickyNoteProps {
   note: StickyNoteType;
   onUpdate: (id: string, updates: Partial<StickyNoteType>) => void;
   onDelete: (id: string) => void;
-  onBringToFront: (id: string) => void;
 }
 
 export const colors = [
@@ -27,7 +26,7 @@ export const colors = [
   '#dadad9', // 灰色
 ];
 
-const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete, onBringToFront }) => {
+const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -53,7 +52,6 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete, onBri
         (e.target as HTMLElement).closest('.color-picker')) {
       return;
     }
-    onBringToFront(note.id);
     setIsDragging(true);
     setDragStart({
       x: e.clientX - note.x,
@@ -63,7 +61,6 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete, onBri
 
   const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    onBringToFront(note.id);
     setIsResizing(true);
     setResizeStart({
       x: e.clientX,
@@ -71,7 +68,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete, onBri
       width: note.width,
       height: note.height,
     });
-  }, [note.id, note.width, note.height, onBringToFront]);
+  }, [note.id, note.width, note.height]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -104,10 +101,6 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete, onBri
       };
     }
   }, [isDragging, isResizing, dragStart, resizeStart, note.id, onUpdate]);
-
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-  };
 
   const handleBlur = () => {
     setIsEditing(false);

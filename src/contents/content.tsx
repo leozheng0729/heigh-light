@@ -139,8 +139,8 @@ const PlasmoOverlay = () => {
 
     // 创建画笔
     drawingBrush.current = new PencilBrush(myCanvas);
-    drawingBrush.current.color = 'red';
-    drawingBrush.current.width = 5;
+    drawingBrush.current.color = 'green';
+    drawingBrush.current.width = 10;
     
     // 获取画布上下文
     myCanvas.getContext();
@@ -235,7 +235,6 @@ const PlasmoOverlay = () => {
           note={note}
           onUpdate={updateNote}
           onDelete={deleteNote}
-          onBringToFront={() => {}}
         />
       ))}
       {
