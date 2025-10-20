@@ -1,11 +1,54 @@
+/* 菜单样式 */
 #pageMarker_canvas2025-wrapper-plasmo .plasmo-overlay {
   position: fixed;
   bottom: 20px;
-  right: 20px;
-  width: 900px;
-  height: 20px;
+  left: 40px;
+  height: 72px;
   z-index: 2147483647;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 14px;
+  color: #888;
+  background-color: hsl(0, 0%, 99%);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+.plasmo-overlay .plasmo-overlay-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items: center;
+  padding: 4px;
+  margin:0 2px;
+  border-radius: 4px;
+  width: 55px;
+}
+.plasmo-overlay .plasmo-overlay-item:hover {
+  cursor: pointer;
+  background: #ddd;
+}
+.plasmo-overlay .plasmo-overlay-item.active::after {
+  content: '';
+  position: absolute;
+  width: 26px;
+  height: 2px;
+  background: #000;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.plasmo-overlay .plasmo-overlay-item svg {
+  width: 30px;
+  height: 30px;
+}
+.plasmo-overlay .plasmo-overlay-item span {
+  display: block;
+  margin-top: 4px;
+}
+
 #pageMarker_canvas2025-wrapper-notes .pageMarker_canvas2025-note-item {
   background-color: rgba(255, 255, 0, 0.3);
   border: 1px solid green;
@@ -74,3 +117,141 @@
 }
 
 
+
+/* 颜色选择 */
+.container {
+  position: absolute;
+  top: -300px;
+  left: 0;
+  width: 258px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 上半部分样式 */
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.top-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.top-circle::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #333;
+}
+
+.top-circle-1, .top-circle-2, .top-circle-3, .top-circle-4, .top-circle-5 {
+  border: 2px solid #ccc;
+}
+
+.top-circle-2::after {
+  width: 6px;
+  height: 6px;
+}
+
+.top-circle-3::after {
+  width: 8px;
+  height: 8px;
+}
+
+.top-circle-4::after {
+  width: 10px;
+  height: 10px;
+}
+
+.top-circle-5::after {
+  width: 14px;
+  height: 14px;
+}
+
+.top-circle.active {
+  border: 2px solid #4285f4;
+}
+
+/* 下半部分样式 */
+.bottom-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.color-circle {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.color-circle.active {
+  width: 28px;
+  height: 28px;
+}
+.color-circle.active::after {
+  border: 2px solid #4285f4;
+  background-color: transparent;
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.color-circle-1 {
+  border: 2px solid #ccc;
+}
+
+.color-circle-2 {
+  background-color: #9e9e9e;
+}
+
+.color-circle-3 {
+  background-color: #f44336;
+}
+
+.color-circle-4 {
+  background-color: #ff9800;
+}
+
+.color-circle-5 {
+  background-color: #ffeb3b;
+}
+
+.color-circle-6 {
+  background-color: #4caf50;
+}
+
+.color-circle-7 {
+  background-color: #80deea;
+}
+
+.color-circle-8 {
+  background-color: #2196f3;
+}
+
+.color-circle-9 {
+  background-color: #1976d2;
+}
+
+.color-circle-10 {
+  background-color: #9c27b0;
+}
