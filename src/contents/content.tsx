@@ -6,6 +6,12 @@ import HighlightManager, { styleContent } from './hight-light';
 import { calculateCanvasHeight, createDrawingCanvas } from "../utils";
 import cssContent from "data-text:./content-style.css"
 
+// 颜色选择
+const brushColors = ['#1976d2', '#f800ff', '#f44336', '#ff9800', '#ffeb3b', '#4caf50', '#80deea', '#2196f3'];
+
+// 画笔粗细
+const brushSizes = [5, 10, 15, 20, 25];
+
 // 浏览器API兼容性处理
 const browserAPI = globalThis.browser?.runtime?.id ? globalThis.browser : globalThis.chrome;
 
@@ -23,6 +29,9 @@ const PlasmoOverlay = () => {
   const [notes, setNotes] = useState<StickyNoteType[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const [maxZIndex, setMaxZIndex] = useState(1);
+  const [brushColor, setBrushColor] = useState(3); // 高亮颜色索引
+  const [pencilBrush, setPencilBrush] = useState(2); // 画笔类型
+  const [pencilMedium, setPencilMedium] = useState(brushSizes[0]); // 画笔粗细
   const canvasObject = useRef(null);
   const currentLine = useRef(null);
   const isDrawingLine = useRef(false); // 正在画线
@@ -270,38 +279,36 @@ const PlasmoOverlay = () => {
             </div>
             <div className="plasmo-overlay-item">
               <div className="container">
-                <h2>荧光笔设置：</h2>
+                <h2>荧光笔设置</h2>
                 <div className="bottom-section">
-                  <div className="color-circle color-circle-1"></div>
-                  <div className="color-circle color-circle-2"></div>
-                  <div className="color-circle color-circle-3"></div>
-                  <div className="color-circle color-circle-4 active"></div>
-                  <div className="color-circle color-circle-5"></div>
-                  <div className="color-circle color-circle-6"></div>
-                  <div className="color-circle color-circle-7"></div>
-                  <div className="color-circle color-circle-8"></div>
-                  {/* <div className="color-circle color-circle-9"></div>
-                  <div className="color-circle color-circle-10"></div> */}
+                  {
+                    brushColors.map((color, index) => (<div
+                      key={color}
+                      onClick={() => { setBrushColor(index); }}
+                      className={`color-circle color-circle-1 ${index === brushColor ? 'active' : ''}`}
+                      style={{ backgroundColor: color }}
+                    ></div>))
+                  }
                 </div>
-                <h2>画笔设置：</h2>
+                <h2>画笔设置</h2>
                 <div className="top-section">
-                  <div className="top-circle top-circle-1"></div>
-                  <div className="top-circle top-circle-2"></div>
-                  <div className="top-circle top-circle-3 active"></div>
-                  <div className="top-circle top-circle-4"></div>
-                  <div className="top-circle top-circle-5"></div>
+                  {
+                    brushSizes.map((size, index) => (<div
+                      key={`${size}-${index}`}
+                      onClick={() => { setPencilMedium(size); }}
+                      className={`top-circle top-circle-${index + 1} ${size === pencilMedium ? 'active' : ''}`}
+                    ></div>))
+                  }
                 </div>
                 <div className="bottom-section">
-                  <div className="color-circle color-circle-1"></div>
-                  <div className="color-circle color-circle-2"></div>
-                  <div className="color-circle color-circle-3"></div>
-                  <div className="color-circle color-circle-4 active"></div>
-                  <div className="color-circle color-circle-5"></div>
-                  <div className="color-circle color-circle-6"></div>
-                  <div className="color-circle color-circle-7"></div>
-                  <div className="color-circle color-circle-8"></div>
-                  {/* <div className="color-circle color-circle-9"></div>
-                  <div className="color-circle color-circle-10"></div> */}
+                  {
+                    brushColors.map((color, index) => (<div
+                      key={color}
+                      onClick={() => { setPencilBrush(index); }}
+                      className={`color-circle ${index === pencilBrush ? 'active' : ''}`}
+                      style={{ backgroundColor: color }}
+                    ></div>))
+                  }
                 </div>
                 <div className="module-action"></div>
               </div>
