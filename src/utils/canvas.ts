@@ -31,7 +31,7 @@ export const calculateCanvasHeight = (): number => {
     documentElement.scrollHeight,
     documentElement.offsetHeight
   )
-
+  console.log("页面高度:", pageHeight);
   let canvasHeight = 7500
 
   // 动态调整画布高度：如果当前滚动位置+屏幕高度超过当前画布高度
@@ -59,9 +59,12 @@ const styleContent = `
     z-index: 2147483646;
     background-color: transparent;
     user-select: none !important;
+    pointer-events: none;
+    display: none;
   }
   #pageMarker_canvas.highlite-canvas-enabled {
-    pointer-events: none !important;
+    pointer-events: auto !important;
+    display: block;
   }
 }`
 
@@ -110,18 +113,18 @@ export const createDrawingCanvas = (
   return canvas
 }
 
-const isCanvasEnabled = (canvas: Canvas) => !canvas.wrapperEl.classList.value.includes('highlite-canvas-enabled');
+const isCanvasEnabled = (canvas: Canvas) => canvas.wrapperEl.classList.value.includes('highlite-canvas-enabled');
 
 export const removeDrawingCanvas = (canvas: Canvas) => {
   canvas.wrapperEl.remove()
 }
 
-export const hideDrawingCanvas = (canvas: Canvas) => {
-  if (!isCanvasEnabled(canvas)) return;
+export const showDrawingCanvas = (canvas: Canvas) => {
+  if (isCanvasEnabled(canvas)) return;
   canvas.wrapperEl.classList.add("highlite-canvas-enabled")
 }
 
-export const showDrawingCanvas = (canvas: Canvas) => {
-  if (isCanvasEnabled(canvas)) return;
+export const hideDrawingCanvas = (canvas: Canvas) => {
+  if (!isCanvasEnabled(canvas)) return;
   canvas.wrapperEl.classList.remove("highlite-canvas-enabled");
 }
