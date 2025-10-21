@@ -60,7 +60,7 @@ const styleContent = `
     background-color: transparent;
     user-select: none !important;
     pointer-events: none;
-    display: none;
+    display: block;
   }
   #pageMarker_canvas.highlite-canvas-enabled {
     pointer-events: auto !important;

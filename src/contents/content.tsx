@@ -39,17 +39,61 @@ const PlasmoOverlay = () => {
   const canvasObject = useRef(null);
   // const currentLine = useRef(null);
   // const isDrawingLine = useRef(false); // 正在画线
-  const isLineDrawing = useRef(false); // 可以画线
+  // const isLineDrawing = useRef(false); // 可以画线
   const isTextEditing = useRef(false); // 正在编辑文本
   const isTextActive = useRef(false); //  可以编辑文本
   const drawingBrush = useRef(null); // 画笔
+  const isMoveActive = useRef(false); // 可以移动
+  // 状态
+  const currentState = useRef(null);
+  const redoStack = useRef([]);
+  const undoStack = useRef([]);
 
   // 高亮组件
   const highlightManager = new HighlightManager();
 
+  // 保存当前画布状态
+  const saveState = () => {
+    if (currentState.current !== null) {
+      undoStack.current.push(currentState.current);
+    }
+    currentState.current = JSON.stringify(canvasObject.current);
+    // 清空重做栈，因为新的操作会覆盖重做历史
+    redoStack.current = [];
+  }
+
+  // 清除画布
+  const clearCanvas = () => {
+    canvasObject.current.clear();
+    saveState();
+  }
+
+  // 撤销/重做操作
+  const performStackOperation = (sourceStack: any[], targetStack: any[]) => {
+    if (sourceStack.length !== 0) {
+      targetStack.push(currentState.current);
+      currentState.current = sourceStack.pop();
+      canvasObject.current.loadFromJSON(currentState.current, () => {
+        canvasObject.current.renderAll();
+      });
+      // canvasObject.current.renderAll();
+    }
+  }
+
+  // 撤销
+  const undo = () => {
+    showDrawingCanvas(canvasObject.current);
+    performStackOperation(undoStack.current, redoStack.current);
+  }
+  // 重做
+  // const redo = () => {
+  //   performStackOperation(redoStack.current, undoStack.current);
+  // }
+
   // 移动工具
   const activateMove = () => {
     canvasObject.current.isDrawingMode = false;
+    isMoveActive.current = true;
     canvasObject.current.getObjects().forEach(obj => {
       obj.selectable = true;
       obj.hoverCursor = "move";
@@ -167,11 +211,11 @@ const PlasmoOverlay = () => {
     // 获取画布上下文
     myCanvas.getContext();
     // 开始编辑文本
-    myCanvas.on("text:editing:entered", function(options) {
+    myCanvas.on("text:editing:entered", function() {
       isTextEditing.current = true;
     });
     // 结束文本编辑
-    myCanvas.on("text:editing:exited", function(options) {
+    myCanvas.on("text:editing:exited", function() {
       isTextEditing.current = isTextActive.current = false;
       activateMove();
     });
@@ -227,6 +271,10 @@ const PlasmoOverlay = () => {
       //   myCanvas.add(currentLine.current);
       // }
     });
+    // 对象修改事件
+    myCanvas.on("object:modified", function() {
+      saveState();
+    });
     // 鼠标移动事件
     // myCanvas.on("mouse:move", (options) => {
     //   if (isDrawingLine.current && isLineDrawing.current) {
@@ -236,12 +284,15 @@ const PlasmoOverlay = () => {
     //   }
     // });
     // 鼠标释放事件
-    // myCanvas.on("mouse:up", (options) => {
-    //   if (isLineDrawing.current) {
-    //     isDrawingLine.current = false;
-    //     currentLine.current.setCoords();
-    //   }
-    // });
+    myCanvas.on("mouse:up", () => {
+      if (!isMoveActive.current && !isTextActive.current) {
+        saveState();
+      }
+      // if (isLineDrawing.current) {
+      //   isDrawingLine.current = false;
+      //   currentLine.current.setCoords();
+      // }
+    });
   }
 
   useEffect(() => {
@@ -293,31 +344,38 @@ const PlasmoOverlay = () => {
         isVisible && (
           <div className="plasmo-overlay">
             <div className="plasmo-overlay-item" onClick={() => activatePen({})}>
+              <div className="plasmo-overlay-item-text">Draw</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill={brushColors[pencilBrush]} d="M652.88 287.76c-41.57 20.34-88.29 31.78-137.68 31.78-49.01 0-95.39-11.25-136.71-31.29l-69.13 136.4a227.6 227.6 0 0 0-24.57 102.84v386.58c0 25.13 20.37 45.49 45.49 45.49h363.44c25.12 0 45.49-20.37 45.49-45.49V523.5c0-33.18-7.26-65.96-21.27-96.04z"/><path fill={brushColors[pencilBrush]} d="M652.88 287.76 561.11 90.73c-16.03-34.41-64.66-35.22-81.82-1.36l-100.8 198.88c41.32 20.05 87.7 31.29 136.71 31.29 49.4 0 96.12-11.43 137.68-31.78"/><path fill="#515151" d="M652.88 287.76c-41.57 20.34-88.29 31.78-137.68 31.78-49.01 0-95.39-11.25-136.71-31.29l-69.13 136.4a227.6 227.6 0 0 0-24.57 102.84v386.58c0 25.13 20.37 45.49 45.49 45.49h363.44c25.12 0 45.49-20.37 45.49-45.49V523.5c0-33.18-7.26-65.96-21.27-96.04z" data-spm-anchor-id="a313x.search_index.0.i18.71e43a81AxmQZi"/><path fill={brushColors[pencilBrush]} d="M652.88 287.76 561.11 90.73c-16.03-34.41-64.66-35.22-81.82-1.36l-100.8 198.88c41.32 20.05 87.7 31.29 136.71 31.29 49.4 0 96.12-11.43 137.68-31.78" data-spm-anchor-id="a313x.search_index.0.i19.71e43a81AxmQZi"/></svg>
               <span>画笔</span>
             </div>
             <div className="plasmo-overlay-item" onClick={() => toggleHighlighting()}>
+              <div className="plasmo-overlay-item-text">Start highlighting</div>
               <svg width="128" height="128" data-spm-anchor-id="a313x.search_index.0.i3.71e43a81AxmQZi" viewBox="0 0 1024 1024"><path fill={brushColors[brushColor]} d="M644 376.94H390.75V189.59c0-12.2 5.81-23 14.43-26.9l211-94.49c13.7-6.12 27.82 7.54 27.82 26.89z" data-spm-anchor-id="a313x.search_index.0.i0.71e43a81AxmQZi"/><path fill="#464646" d="M862.16 905.39c-1-59.44.06-118.92-.45-178.37-.71-81.9-39.19-140.79-112.26-176.41-15.77-7.69-20.7-16.74-20.33-33.16.89-39.05.32-78.14.27-117.21-.07-53.06-12-72.38-55.81-76.73H357.86c-44.16 2.49-59.53 23.19-59.75 71.09-.17 39.07-1.22 78.2.42 117.2.91 21.56-5.86 33-25.92 42.9-61.82 30.41-96.51 81.3-103.27 150.2-6.65 67.79-1 135.82-3.32 203.68-.88 25.64 12.59 28 33.31 28.4 22 .38 30.1-6.76 29.67-29.26-1.15-61.14-.71-122.31-.24-183.47.47-60.11 36.74-107.65 94.2-124.83 33.4-10 38.66-17.28 38.45-52.63-.26-43.32.08-86.65-.77-129.95-.44-22.63 9-32.6 31.87-32.2 40 .69 79.94.19 119.91.15s80-.27 119.92 0c28.71.23 36.66 7.69 37 36.09.56 43.31.08 86.64.24 130 .14 35.79 2.54 38.71 38.16 49 50.91 14.77 85.47 55.33 91.08 107.93 7 66.07 2.68 132.39 2.79 198.59 0 23.39 7.59 30.39 30.73 30.71 24.73.39 30.2-9.66 29.82-31.72"/></svg>
               <span>荧光笔</span>
               <span className="rectangle" style={{ backgroundColor: brushColors[brushColor] }}></span>
             </div>
             <div className="plasmo-overlay-item" onClick={() => activateText()}>
+              <div className="plasmo-overlay-item-text">Add a text box</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill="#515151" d="M851.968 167.936v109.568h-281.6V865.28H453.632V277.504h-281.6V167.936z"/></svg>
               <span>文字</span>
             </div>
             <div className="plasmo-overlay-item" onClick={() => createStickyNote()}>
+              <div className="plasmo-overlay-item-text">Add a note</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill="#515151" d="M113.778 967.111h568.889l227.555-227.555V56.889H113.778zm56.889-56.889V113.778h682.666V713.5L666.34 910.222z"/><path fill="#515151" d="M625.778 967.111h56.889V739.556h227.555v-56.89H625.778zM341.333 341.333h341.334v56.89H341.333zm0 170.667h341.334v56.889H341.333z"/></svg>
               <span>便签</span>
             </div>
-            <div className="plasmo-overlay-item">
+            <div className="plasmo-overlay-item" onClick={() => undo()}>
+              <div className="plasmo-overlay-item-text">Rollback</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill="#515151" d="M362.88 341.12V512l-256-213.12 256-213.76V256H576a341.76 341.76 0 0 1 0 682.88H192v-85.76h384a256 256 0 0 0 0-512z"/></svg>
               <span>撤销</span>
             </div>
-            <div className="plasmo-overlay-item">
+            <div className="plasmo-overlay-item" onClick={() => clearCanvas()}>
+              <div className="plasmo-overlay-item-text">Clear</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill="#d81e06" d="M231.373 910.746V327.68h-76.8v659.866h714.803V204.8h-76.8v705.946H231.424zM657.92 89.6v84.48h76.8V12.8H289.28v161.28h76.8V89.6z"/><path fill="#d81e06" d="M579.942 343.654V704h76.8V343.654zm-136.499-.614.615 38.4 4.454 278.374.614 38.4-76.8 1.23-.614-38.4-4.454-278.426-.564-38.4 76.8-1.178zM972.8 243.2H51.2v-76.8h921.6z"/></svg>
               <span>清空</span>
             </div>
             <div className="plasmo-overlay-item" onClick={() => captureScreenshot()}>
+              <div className="plasmo-overlay-item-text">Screenshot</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill="#515151" d="M473.6 617.024V120.96a19.2 19.2 0 0 1 19.2-19.2h38.4a19.2 19.2 0 0 1 19.2 19.2v496l240.896-240.832a19.2 19.2 0 0 1 27.136 0l27.136 27.136a19.2 19.2 0 0 1 0 27.136L539.136 736.832a38.4 38.4 0 0 1-54.272 0L178.432 430.464a19.2 19.2 0 0 1 0-27.136l27.136-27.136a19.2 19.2 0 0 1 27.136 0L473.6 616.96zm424.64 285.12a19.2 19.2 0 0 1-19.2 19.2h-729.6a19.2 19.2 0 0 1-19.2-19.2v-38.4a19.2 19.2 0 0 1 19.2-19.2h729.6a19.2 19.2 0 0 1 19.2 19.2z"/></svg>
               <span>保存</span>
             </div>

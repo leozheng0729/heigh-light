@@ -27,6 +27,42 @@
   width: 55px;
 }
 .plasmo-overlay .plasmo-overlay-item:hover {
+  background: #ceced7;
+}
+.plasmo-overlay .plasmo-overlay-item:hover .plasmo-overlay-item-text {
+  visibility: visible;
+  opacity: 1;
+}
+.plasmo-overlay .plasmo-overlay-item-text {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-weight: normal;
+  font-size: 12px;
+  position: absolute;
+  z-index: 0;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 1; /* 0 */
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+}
+.plasmo-overlay .plasmo-overlay-item-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+.plasmo-overlay .plasmo-overlay-item:hover {
   cursor: pointer;
 }
 .plasmo-overlay .plasmo-overlay-item:active {
