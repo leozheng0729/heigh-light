@@ -79,7 +79,7 @@ export const createDrawingCanvas = (
 ): Canvas => {
   // 合并用户自定义配置与默认配置
   const defaultOptions = {
-    isDrawingMode: true,
+    isDrawingMode: false,
     width: document.body.clientWidth,
     height: canvasHeight
   }
@@ -90,7 +90,7 @@ export const createDrawingCanvas = (
   const canvas = new Canvas(canvasId, mergedOptions)
 
   // 设置全局对象属性
-  // FabricObject.prototype.transparentCorners = true;
+  FabricObject.prototype.transparentCorners = true;
 
   // 设置画布尺寸（确保与选项一致）
   canvas.setDimensions({
@@ -108,4 +108,20 @@ export const createDrawingCanvas = (
   document.body.appendChild(canvas.wrapperEl)
 
   return canvas
+}
+
+const isCanvasEnabled = (canvas: Canvas) => !canvas.wrapperEl.classList.value.includes('highlite-canvas-enabled');
+
+export const removeDrawingCanvas = (canvas: Canvas) => {
+  canvas.wrapperEl.remove()
+}
+
+export const hideDrawingCanvas = (canvas: Canvas) => {
+  if (!isCanvasEnabled(canvas)) return;
+  canvas.wrapperEl.classList.add("highlite-canvas-enabled")
+}
+
+export const showDrawingCanvas = (canvas: Canvas) => {
+  if (isCanvasEnabled(canvas)) return;
+  canvas.wrapperEl.classList.remove("highlite-canvas-enabled");
 }

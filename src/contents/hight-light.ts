@@ -10,11 +10,14 @@ export const styleContent = `
     transition: background-color 0.2s ease;
   }
 
-  .text-highlight-yellow { background-color: #FFFF5C; }
-  .text-highlight-pink { background-color: #f8879b; }
-  .text-highlight-blue { background-color: #00CFFF; }
-  .text-highlight-green { background-color: #7CFC00; }
-  .text-highlight-orange { background-color: #FF9E00; }
+  .text-highlight-oceanblue { background-color: #1976d2; }
+  .text-highlight-purple { background-color: #f800ff; }
+  .text-highlight-red { background-color: #f44336; }
+  .text-highlight-orange { background-color: #ff9800; }
+  .text-highlight-yellow { background-color: #ffeb3b; }
+  .text-highlight-green { background-color: #4caf50; }
+  .text-highlight-cyan { background-color: #80deea; }
+  .text-highlight-indigo { background-color: #2196f3; }
 
   .highlight-remove-btn {
     position: absolute;
