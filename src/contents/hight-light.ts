@@ -239,10 +239,10 @@ export default class HighlightManager {
     const parents = new Set<Node>();
     highlights.forEach((highlight) => {
       const parent = highlight.parentNode
-      if (parent) parents.add(parent)
+      if (parent) parents.add(parent as Node)
     })
 
-    parents.forEach((parent) => parent.normalize())
+    parents.forEach((parent: Node) => parent.normalize())
   }
 
   // 阻止选择事件

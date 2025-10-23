@@ -1,6 +1,15 @@
 // import fabric from 'fabric';
 // const fabric = require('fabric').fabric;
-import { Canvas, FabricObject } from "fabric"
+// import { Canvas, FabricObject } from "fabric"
+import { fabric } from "fabric"
+import type { Canvas } from "fabric/fabric-impl"
+
+// 扩展Canvas类型以包含wrapperEl属性
+declare module "fabric/fabric-impl" {
+  interface Canvas {
+    wrapperEl: HTMLElement;
+  }
+}
 
 /**
  * 动态计算并调整画布高度
@@ -18,12 +27,24 @@ import { Canvas, FabricObject } from "fabric"
 
 export const calculateCanvasHeight = (): number => {
   // 页面尺寸计算
-  const bodyElement = document.body
-  const documentElement = document.documentElement
+  const bodyElement = document.body;
+  const documentElement = document.documentElement;
   const scrollTop =
-    document.body.scrollTop || document.documentElement.scrollTop
+    document.body.scrollTop || document.documentElement.scrollTop;
 
   // 获取页面总高度（取各种高度属性的最大值）
+  console.log("页面高度1:", bodyElement.scrollHeight,
+    bodyElement.offsetHeight,
+    documentElement.clientHeight,
+    documentElement.scrollHeight,
+    documentElement.offsetHeight);
+  requestAnimationFrame(() => {
+    console.log("页面高度2:", bodyElement.scrollHeight,
+      bodyElement.offsetHeight,
+      documentElement.clientHeight,
+      documentElement.scrollHeight,
+      documentElement.offsetHeight);
+  })
   const pageHeight = Math.max(
     bodyElement.scrollHeight,
     bodyElement.offsetHeight,
@@ -35,10 +56,12 @@ export const calculateCanvasHeight = (): number => {
   let canvasHeight = 7500
 
   // 动态调整画布高度：如果当前滚动位置+屏幕高度超过当前画布高度
+  console.log("当位置:", scrollTop + screen.height);
   if (scrollTop + screen.height > canvasHeight) {
     // 如果当前滚动位置 + 整个屏幕高度 > 当前画布高度
     // 说明用户即将滚动到画布底部，需要扩展画布高度
-    canvasHeight += ((scrollTop + screen.height) / 7500) * 7500
+    console.log("Expanding canvas height to:", scrollTop + screen.height);
+    canvasHeight = scrollTop + screen.height
   }
 
   // 确保画布高度不超过页面总高度
@@ -79,7 +102,7 @@ export const createDrawingCanvas = (
   canvasHeight: number,
   canvasId: string = "c",
   fabricOptions: object = {}
-): Canvas => {
+): fabric.Canvas => {
   // 合并用户自定义配置与默认配置
   const defaultOptions = {
     isDrawingMode: false,
@@ -87,13 +110,19 @@ export const createDrawingCanvas = (
     height: canvasHeight
   }
 
-  const mergedOptions = { ...defaultOptions, ...fabricOptions }
+  const mergedOptions = {
+    ...defaultOptions,
+    ...fabricOptions,
+    // renderOnAddRemove: false, // 减少自动重绘
+    // skipOffscreen: true,      // 跳过屏幕外对象渲染
+    // enableRetinaScaling: false // 在动态调整尺寸时禁用视网膜缩放
+  }
 
   // 创建画布实例
-  const canvas = new Canvas(canvasId, mergedOptions)
+  const canvas = new fabric.Canvas(canvasId, mergedOptions)
 
   // 设置全局对象属性
-  FabricObject.prototype.transparentCorners = true;
+  fabric.Object.prototype.transparentCorners = true;
 
   // 设置画布尺寸（确保与选项一致）
   canvas.setDimensions({
@@ -109,7 +138,6 @@ export const createDrawingCanvas = (
   // 设置包装元素ID并添加到页面
   canvas.wrapperEl.id = "pageMarker_canvas"
   document.body.appendChild(canvas.wrapperEl)
-
   return canvas
 }
 

@@ -26,6 +26,7 @@
   border-radius: 4px;
   width: 55px;
 }
+.plasmo-overlay .plasmo-overlay-item.active,
 .plasmo-overlay .plasmo-overlay-item:hover {
   background: #ceced7;
 }

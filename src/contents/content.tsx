@@ -1,6 +1,7 @@
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Line, IText, PencilBrush, Rect, Shadow, Group, Textbox } from 'fabric';
+// import { IText, PencilBrush, EraserBrush } from 'fabric';
+import { fabric } from 'fabric';
 import StickyNote, { type StickyNoteType, colors } from "./sticky-note";
 import HighlightManager, { styleContent } from './hight-light';
 import { calculateCanvasHeight, createDrawingCanvas, showDrawingCanvas, hideDrawingCanvas } from "../utils";
@@ -10,7 +11,6 @@ import cssContent from "data-text:./content-style.css"
 // 颜色选择
 const brushColors = ['#1976d2', '#f800ff', '#f44336', '#ff9800', '#ffeb3b', '#4caf50', '#80deea', '#2196f3'];
 const brushColorsEn = ['oceanblue', 'purple', 'red', 'orange', 'yellow', 'green', 'cyan', 'indigo'];
-
 
 // 画笔粗细
 const brushSizes = [5, 10, 15, 20, 25];
@@ -26,6 +26,13 @@ export const getStyle: PlasmoGetStyle = () => {
   const style = document.createElement("style");
   style.textContent = cssContent;
   return style
+}
+
+enum buttonStatus {
+  draw = 'draw', // 画笔
+  brush = 'brush', // 荧光笔
+  text = 'text', // 文本
+  other = 'other', // 不选中
 }
 
 const PlasmoOverlay = () => {
@@ -44,6 +51,8 @@ const PlasmoOverlay = () => {
   const isTextActive = useRef(false); //  可以编辑文本
   const drawingBrush = useRef(null); // 画笔
   const isMoveActive = useRef(false); // 可以移动
+  const [isCurrentStatus, setIsCurrentStatus] = useState<buttonStatus>(buttonStatus.other); // 当前状态
+
   // 状态
   const currentState = useRef(null);
   const redoStack = useRef([]);
@@ -54,12 +63,11 @@ const PlasmoOverlay = () => {
 
   // 保存当前画布状态
   const saveState = () => {
+    undoStack.current = [];
     if (currentState.current !== null) {
-      undoStack.current.push(currentState.current);
+      redoStack.current.push(currentState.current);
     }
     currentState.current = JSON.stringify(canvasObject.current);
-    // 清空重做栈，因为新的操作会覆盖重做历史
-    redoStack.current = [];
   }
 
   // 清除画布
@@ -68,22 +76,28 @@ const PlasmoOverlay = () => {
     saveState();
   }
 
+  // 橡皮擦工具
+  const activateEraser = () => {
+    // canvasObject.current.freeDrawingBrush = eraserBrush;
+    // thicknessSlider.value = eraseThickness;
+    // canvas.freeDrawingBrush.width = parseInt(thicknessSlider.value) || 5;
+  }
+
   // 撤销/重做操作
   const performStackOperation = (sourceStack: any[], targetStack: any[]) => {
     if (sourceStack.length !== 0) {
       targetStack.push(currentState.current);
       currentState.current = sourceStack.pop();
-      canvasObject.current.loadFromJSON(currentState.current, () => {
-        canvasObject.current.renderAll();
-      });
-      // canvasObject.current.renderAll();
+      canvasObject.current.clear();
+      canvasObject.current.loadFromJSON(currentState.current);
+      canvasObject.current.renderAll();
     }
   }
 
   // 撤销
   const undo = () => {
     showDrawingCanvas(canvasObject.current);
-    performStackOperation(undoStack.current, redoStack.current);
+    performStackOperation(redoStack.current, undoStack.current);
   }
   // 重做
   // const redo = () => {
@@ -128,6 +142,8 @@ const PlasmoOverlay = () => {
 
   // 激活画线
   const activatePen = (param: { brush?: number, medium?: number }) => {
+    canvasObject.current.discardActiveObject().renderAll();
+
     canvasObject.current.isDrawingMode = true;
     showDrawingCanvas(canvasObject.current);
     const { brush, medium } = param;
@@ -174,12 +190,6 @@ const PlasmoOverlay = () => {
     const { type, payload } = message;
     switch (type) {
       case 'toggleToolbar':
-        if (!isVisible) {
-          // 初始化 Canvas 面板
-          // initCanvas();
-        } else {
-          // 去除内容
-        }
         // 显示组件
         setIsVisible(prev => !prev);
         break;
@@ -204,7 +214,7 @@ const PlasmoOverlay = () => {
     const myCanvas = canvasObject.current =createDrawingCanvas(adjustedCanvasHeight, "myCanvas");
 
     // 创建画笔
-    drawingBrush.current = new PencilBrush(myCanvas);
+    drawingBrush.current = new fabric.PencilBrush(myCanvas);
     drawingBrush.current.color = brushColors[pencilBrush];
     drawingBrush.current.width = pencilMedium;
     
@@ -223,7 +233,7 @@ const PlasmoOverlay = () => {
     myCanvas.on("mouse:down", (options) => {
       if (isTextActive.current && !isTextEditing.current) {
         const event = options.e;
-        const pointer = myCanvas.getScenePoint(event);
+        const pointer = myCanvas.getPointer(event);
         const fontSize = 24; // const fontSize = 2 * parseInt(thicknessSlider.value);
         let x = pointer.x;
         let y = pointer.y;
@@ -231,12 +241,12 @@ const PlasmoOverlay = () => {
         // 触摸事件
         if (event.type === "touchstart" && "targetTouches" in event) {
           const bounds = (event.target as Element).getBoundingClientRect();
-          x = (event as TouchEvent).targetTouches[0].pageX - bounds.left;
-          y = (event as TouchEvent).targetTouches[0].pageY - bounds.top;
+          x = (event as unknown as TouchEvent).targetTouches[0].pageX - bounds.left;
+          y = (event as unknown as TouchEvent).targetTouches[0].pageY - bounds.top;
         }
 
         // 创建文本对象
-        const textObject = new IText("", {
+        const textObject = new fabric.IText("", {
           fontFamily: "arial",
           fontSize: fontSize,
           fill: 'red', // colorPicker.value
@@ -303,7 +313,7 @@ const PlasmoOverlay = () => {
         const brushColorValue = JSON.parse(brushColor[heighbrushColor]);
         brushColorValue && setBrushColor(brushColorValue);
       } catch (error) {
-        console.log(`荧光笔颜色获取：${error}`);
+        // console.log(`荧光笔颜色获取：${error}`);
       }
 
       try {
@@ -311,7 +321,7 @@ const PlasmoOverlay = () => {
         const pencilColorValue = JSON.parse(pencilColor[heighpencilColor]);
         pencilColorValue && setPencilBrush(pencilColorValue);
       } catch (error) {
-        console.log(`画笔颜色获取：${error}`);
+        // console.log(`画笔颜色获取：${error}`);
       }
       
       try {
@@ -319,14 +329,30 @@ const PlasmoOverlay = () => {
         const pencilSizeValue = JSON.parse(pencilSize[heighpencilSize]);
         pencilSizeValue && setPencilMedium(pencilSizeValue);
       } catch (error) {
-        console.log(`画笔尺寸获取：${error}`);
+        // console.log(`画笔尺寸获取：${error}`);
       }
     }
-    initCanvas();
+
+    // 页面已经加载完成
+    const handleLoad = () => { 
+      initCanvas();
+      // 添加样式文件
+      const styleElement = document.createElement("style");
+      styleElement.textContent = styleContent;
+      document.head.appendChild(styleElement);
+    };
+
+    // 检查页面状态
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
     initData();
-    browserAPI.runtime.onMessage.addListener(handleMessage)
+    browserAPI.runtime.onMessage.addListener(handleMessage);
     return () => {
-      browserAPI.runtime.onMessage.removeListener(handleMessage)
+      window.removeEventListener('load', handleLoad);
+      browserAPI.runtime.onMessage.removeListener(handleMessage);
     }
   }, [])
 
@@ -343,18 +369,18 @@ const PlasmoOverlay = () => {
       {
         isVisible && (
           <div className="plasmo-overlay">
-            <div className="plasmo-overlay-item" onClick={() => activatePen({})}>
+            <div className={`plasmo-overlay-item ${isCurrentStatus === buttonStatus.draw ? 'active' : ''}`} onClick={() => activatePen({})}>
               <div className="plasmo-overlay-item-text">Draw</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill={brushColors[pencilBrush]} d="M652.88 287.76c-41.57 20.34-88.29 31.78-137.68 31.78-49.01 0-95.39-11.25-136.71-31.29l-69.13 136.4a227.6 227.6 0 0 0-24.57 102.84v386.58c0 25.13 20.37 45.49 45.49 45.49h363.44c25.12 0 45.49-20.37 45.49-45.49V523.5c0-33.18-7.26-65.96-21.27-96.04z"/><path fill={brushColors[pencilBrush]} d="M652.88 287.76 561.11 90.73c-16.03-34.41-64.66-35.22-81.82-1.36l-100.8 198.88c41.32 20.05 87.7 31.29 136.71 31.29 49.4 0 96.12-11.43 137.68-31.78"/><path fill="#515151" d="M652.88 287.76c-41.57 20.34-88.29 31.78-137.68 31.78-49.01 0-95.39-11.25-136.71-31.29l-69.13 136.4a227.6 227.6 0 0 0-24.57 102.84v386.58c0 25.13 20.37 45.49 45.49 45.49h363.44c25.12 0 45.49-20.37 45.49-45.49V523.5c0-33.18-7.26-65.96-21.27-96.04z" data-spm-anchor-id="a313x.search_index.0.i18.71e43a81AxmQZi"/><path fill={brushColors[pencilBrush]} d="M652.88 287.76 561.11 90.73c-16.03-34.41-64.66-35.22-81.82-1.36l-100.8 198.88c41.32 20.05 87.7 31.29 136.71 31.29 49.4 0 96.12-11.43 137.68-31.78" data-spm-anchor-id="a313x.search_index.0.i19.71e43a81AxmQZi"/></svg>
               <span>画笔</span>
             </div>
-            <div className="plasmo-overlay-item" onClick={() => toggleHighlighting()}>
+            <div className={`plasmo-overlay-item ${isCurrentStatus === buttonStatus.brush ? 'active' : ''}`} onClick={() => toggleHighlighting()}>
               <div className="plasmo-overlay-item-text">Start highlighting</div>
               <svg width="128" height="128" data-spm-anchor-id="a313x.search_index.0.i3.71e43a81AxmQZi" viewBox="0 0 1024 1024"><path fill={brushColors[brushColor]} d="M644 376.94H390.75V189.59c0-12.2 5.81-23 14.43-26.9l211-94.49c13.7-6.12 27.82 7.54 27.82 26.89z" data-spm-anchor-id="a313x.search_index.0.i0.71e43a81AxmQZi"/><path fill="#464646" d="M862.16 905.39c-1-59.44.06-118.92-.45-178.37-.71-81.9-39.19-140.79-112.26-176.41-15.77-7.69-20.7-16.74-20.33-33.16.89-39.05.32-78.14.27-117.21-.07-53.06-12-72.38-55.81-76.73H357.86c-44.16 2.49-59.53 23.19-59.75 71.09-.17 39.07-1.22 78.2.42 117.2.91 21.56-5.86 33-25.92 42.9-61.82 30.41-96.51 81.3-103.27 150.2-6.65 67.79-1 135.82-3.32 203.68-.88 25.64 12.59 28 33.31 28.4 22 .38 30.1-6.76 29.67-29.26-1.15-61.14-.71-122.31-.24-183.47.47-60.11 36.74-107.65 94.2-124.83 33.4-10 38.66-17.28 38.45-52.63-.26-43.32.08-86.65-.77-129.95-.44-22.63 9-32.6 31.87-32.2 40 .69 79.94.19 119.91.15s80-.27 119.92 0c28.71.23 36.66 7.69 37 36.09.56 43.31.08 86.64.24 130 .14 35.79 2.54 38.71 38.16 49 50.91 14.77 85.47 55.33 91.08 107.93 7 66.07 2.68 132.39 2.79 198.59 0 23.39 7.59 30.39 30.73 30.71 24.73.39 30.2-9.66 29.82-31.72"/></svg>
               <span>荧光笔</span>
               <span className="rectangle" style={{ backgroundColor: brushColors[brushColor] }}></span>
             </div>
-            <div className="plasmo-overlay-item" onClick={() => activateText()}>
+            <div className={`plasmo-overlay-item ${isCurrentStatus === buttonStatus.text ? 'active' : ''}`} onClick={() => activateText()}>
               <div className="plasmo-overlay-item-text">Add a text box</div>
               <svg width="128" height="128" viewBox="0 0 1024 1024"><path fill="#515151" d="M851.968 167.936v109.568h-281.6V865.28H453.632V277.504h-281.6V167.936z"/></svg>
               <span>文字</span>
@@ -435,10 +461,3 @@ const PlasmoOverlay = () => {
 }
 
 export default PlasmoOverlay;
-
-window.addEventListener("load", () => {
-  // 添加样式文件
-  const styleElement = document.createElement("style");
-  styleElement.textContent = styleContent;
-  document.head.appendChild(styleElement);
-})
