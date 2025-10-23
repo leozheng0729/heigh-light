@@ -140,6 +140,12 @@ const PlasmoOverlay = () => {
   //   isLineDrawing.current = true;
   // }
 
+  const setParams = (param: { brush?: number, medium?: number }) => {
+    setBrushColor(param.brush || 0);
+    setPencilBrush(param.brush || 0);
+    setPencilMedium(param.medium || 0);
+  }
+
   // 激活画线
   const activatePen = (param: { brush?: number, medium?: number }) => {
     canvasObject.current.discardActiveObject().renderAll();
