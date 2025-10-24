@@ -1,0 +1,20 @@
+{
+  "highlighterpen": {
+    "message": "Pen"
+  },
+  "Word": {
+    "message": "Text"
+  },
+  "Notes": {
+    "message": "Notes"
+  },
+  "Clear": {
+    "message": "Clear"
+  },
+  "Save": {
+    "message": "Save"
+  },
+  "Set": {
+    "message": "Options"
+  }
+}

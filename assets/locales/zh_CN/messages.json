@@ -1,0 +1,20 @@
+{
+  "highlighterpen": {
+    "message": "荧光笔"
+  },
+  "Word": {
+    "message": "文字"
+  },
+  "Notes": {
+    "message": "便签"
+  },
+  "Clear": {
+    "message": "清空"
+  },
+  "Save": {
+    "message": "保存"
+  },
+  "Set": {
+    "message": "设置"
+  }
+}
