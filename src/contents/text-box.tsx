@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-export interface StickyNoteType {
+export interface TextBoxType {
   id: string;
   content: string;
   x: number;
@@ -11,22 +11,31 @@ export interface StickyNoteType {
   zIndex?: number;
 }
 
-interface StickyNoteProps {
-  note: StickyNoteType;
-  onUpdate: (id: string, updates: Partial<StickyNoteType>) => void;
+interface TextBoxProps {
+  note: TextBoxType;
+  onUpdate: (id: string, updates: Partial<TextBoxType>) => void;
   onDelete: (id: string) => void;
 }
 
-export const colors = [
-  '#fde93c', // 黄色
-  '#88f0ff', // 蓝色
-  '#82ff83', // 绿色
-  '#ffb2b2', // 粉红色
-  '#99b6ff', // 紫色
-  '#dadad9', // 灰色
+export const textColors = [
+  '#1976d2',
+  '#f800ff',
+  '#f44336',
+  '#ff9800',
+  '#e2cc07ff',
+  '#4caf50',
 ];
 
-const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => {
+const textColorsClass = {
+  '#1976d2': 't-blue',
+  '#f800ff': 't-purple',
+  '#f44336': 't-red',
+  '#ff9800': 't-orange',
+  '#e2cc07ff': 't-yellow',
+  '#4caf50': 't-green',
+};
+
+const TextBox: React.FC<TextBoxProps> = ({ note, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -61,17 +70,6 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
     });
   };
 
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsResizing(true);
-    setResizeStart({
-      x: e.clientX,
-      y: e.clientY,
-      width: note.width,
-      height: note.height,
-    });
-  }, [note.id, note.width, note.height]);
-
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
@@ -83,8 +81,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
         const deltaX = e.clientX - resizeStart.x;
         const deltaY = e.clientY - resizeStart.y;
         onUpdate(note.id, {
-          width: Math.max(180, resizeStart.width + deltaX),
-          height: Math.max(130, resizeStart.height + deltaY),
+          width: Math.max(150, resizeStart.width + deltaX),
         });
       }
     };
@@ -126,8 +123,8 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
         left: `${note.x}px`,
         top: `${note.y}px`,
         width: `${note.width}px`,
-        height: `${note.height}px`,
-        backgroundColor: note.color,
+        height: 'auto',
+        backgroundColor: 'transparent',
         zIndex: note.zIndex,
         cursor: isDragging ? 'grabbing' : 'grab',
       }}
@@ -136,9 +133,14 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
       {/* Header */}
       <div className="sticky-note-header">
         {/* Delete button */}
-        <div className="highlite-post-it-header" >
+        <div className="highlite-post-it-header" style={{ justifyContent: 'flex-start'}}>
+          <button
+            title="删除文字区域"
+            className="highlite-delete-btn"
+            onClick={() => onDelete(note.id)}
+          >×</button>
           {
-            colors.map((color) => (<span
+            textColors.map((color) => (<span
               key={color}
               className="highlite-post-it-header-color"
               style={{ backgroundColor: color }}
@@ -146,30 +148,22 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
               title="更改颜色"
             ></span>))
           }
-          <button
-            title="删除便签"
-            className="highlite-delete-btn"
-            onClick={() => onDelete(note.id)}
-          >×</button>
+          <svg width="48" height="48" viewBox="0 0 1024 1024"><path fill="#515151" d="M960 672a64 64 0 1 1 0 128 64 64 0 0 1 0-128M736 448a64 64 0 1 1 0 128 64 64 0 0 1 0-128m224 0a64 64 0 1 1 0 128 64 64 0 0 1 0-128M736 224a64 64 0 1 1 0 128 64 64 0 0 1 0-128m-224 0a64 64 0 1 1 0 128 64 64 0 0 1 0-128m448 0a64 64 0 1 1 0 128 64 64 0 0 1 0-128M288 0a64 64 0 1 1 0 128 64 64 0 0 1 0-128m448 0a64 64 0 1 1 0 128 64 64 0 0 1 0-128m224 0a64 64 0 1 1 0 128 64 64 0 0 1 0-128M512 0a64 64 0 1 1 0 128 64 64 0 1 1 0-128"/></svg>
         </div>
 
         {/* Content */}
         <textarea
           ref={textareaRef}
-          className="note-area"
+          className={`note-area text-area ${textColorsClass[note.color]}`}
           value={note.content}
           onChange={handleContentChange}
           onBlur={handleBlur}
           placeholder="Write here..."
-          style={{ cursor: 'text' }}
+          style={{ cursor: 'text', color: note.color }}
         />
-
-        {/* Resize Handle */}
-        <div className="resize-handle" onMouseDown={handleResizeMouseDown}></div>
       </div>
     </div>
   );
 };
 
-export default StickyNote;
-
+export default TextBox;

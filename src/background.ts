@@ -1,5 +1,4 @@
 export {}
-console.log("HELLO WORLD FROM BGSCRIPTS")
 
 // 浏览器API兼容性处理
 const browserAPI = globalThis.browser?.runtime?.id ? globalThis.browser : globalThis.chrome;

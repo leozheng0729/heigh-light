@@ -27,9 +27,12 @@
   width: 55px;
   line-height: 1.15;
 }
-.plasmo-overlay .plasmo-overlay-item.active,
+
 .plasmo-overlay .plasmo-overlay-item:hover {
-  background: #ceced7;
+  background: rgba(206, 206, 215, 0.4);
+}
+.plasmo-overlay .plasmo-overlay-item.active {
+  background: rgb(206, 206, 215);
 }
 .plasmo-overlay .plasmo-overlay-item:hover .plasmo-overlay-item-text {
   visibility: visible;
@@ -88,14 +91,6 @@
   transform: translateX(-50%);
 }
 
-/* #pageMarker_canvas2025-wrapper-notes .pageMarker_canvas2025-note-item {
-  background-color: rgba(255, 255, 0, 0.3);
-  border: 1px solid green;
-  border-radius: 4px;
-  padding: 2px 4px;
-  color:red;
-} */
-
 .sticky-note-header {
   display: flex;
   flex-direction: column;
@@ -107,12 +102,20 @@
   opacity: 1;
 }
 .highlite-post-it-header {
+  position: relative;
   opacity: 0;
   display: flex;
   justify-content: flex-end;
   cursor: grab;
   height: 12px;
   align-items: center;
+}
+.highlite-post-it-header svg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
 }
 .highlite-post-it-header .highlite-delete-btn {
   background: transparent;
@@ -144,6 +147,28 @@
   outline: none;
   flex-grow: 1;
 }
+.text-area {
+  color: red;
+  font-size: 16px;
+}
+
+.text-area.t-red::placeholder { color: #f44336; }
+.text-area.t-red::-webkit-input-placeholder { color: #f44336; }
+
+.text-area.t-blue::placeholder { color: #1976d2; }
+.text-area.t-blue::-webkit-input-placeholder { color: #1976d2; }
+
+.text-area.t-purple::placeholder { color: #f800ff; }
+.text-area.t-purple::-webkit-input-placeholder { color: #f800ff; }
+
+.text-area.t-orange::placeholder { color: #ff9800; }
+.text-area.t-orange::-webkit-input-placeholder { color: #ff9800; }
+
+.text-area.t-green::placeholder { color: #4caf50; }
+.text-area.t-green::-webkit-input-placeholder { color: #4caf50; }
+
+.text-area.t-yellow::placeholder { color: #e2cc07ff; }
+.text-area.t-yellow::-webkit-input-placeholder { color: #e2cc07ff; }
 
 .resize-handle {
   position: absolute;
@@ -154,8 +179,6 @@
   cursor: nwse-resize;
   background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.2) 50%);
 }
-
-
 
 /* 颜色选择 */
 .container {
