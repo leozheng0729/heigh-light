@@ -1,8 +1,8 @@
 {
   "name": "heigh-light",
-  "displayName": "Highlite web page - Annotate, highlight and share",
+  "displayName": "Highlite web page - Annotate, highlight and Screenshot to share",
   "version": "0.0.1",
-  "description": "Highlite - Annotate, highlight, draw, and share on any web page",
+  "description": "Highlite - Annotate, highlight, and share on any web page",
   "author": "wp",
   "scripts": {
     "dev": "plasmo dev",
