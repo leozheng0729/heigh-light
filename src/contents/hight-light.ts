@@ -24,60 +24,60 @@ export const styleContent = `
   }
   
   .highlite-cursor-20251028_oceanblue {
-    cursor: var(--cursor-highlight-oceanblue);
+    cursor: var(--cursor-highlight-oceanblue) !important;
   }
   .highlite-cursor-20251028_oceanblue a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-oceanblue);
+    cursor: var(--cursor-highlight-oceanblue) !important;
   }
   .highlite-cursor-20251028_purple {
-    cursor: var(--cursor-highlight-purple);
+    cursor: var(--cursor-highlight-purple) !important;
   }
   .highlite-cursor-20251028_purple a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-purple);
+    cursor: var(--cursor-highlight-purple) !important;
   }
   .highlite-cursor-20251028_red {
-    cursor: var(--cursor-highlight-red);
+    cursor: var(--cursor-highlight-red) !important;
   }
   .highlite-cursor-20251028_red a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-red);
+    cursor: var(--cursor-highlight-red) !important;
   }
-    .highlite-cursor-20251028_orange {
-    cursor: var(--cursor-highlight-orange);
+  .highlite-cursor-20251028_orange {
+    cursor: var(--cursor-highlight-orange) !important;
   }
   .highlite-cursor-20251028_orange a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-orange);
+    cursor: var(--cursor-highlight-orange) !important;
   }
-    .highlite-cursor-20251028_yellow {
-    cursor: var(--cursor-highlight-yellow);
+  .highlite-cursor-20251028_yellow {
+    cursor: var(--cursor-highlight-yellow) !important;
   }
   .highlite-cursor-20251028_yellow a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-yellow);
+    cursor: var(--cursor-highlight-yellow) !important;
   }
     .highlite-cursor-20251028_green {
-    cursor: var(--cursor-highlight-green);
+    cursor: var(--cursor-highlight-green) !important;
   }
   .highlite-cursor-20251028_green a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-green);
+    cursor: var(--cursor-highlight-green) !important;
   }
     .highlite-cursor-20251028_cyan {
-    cursor: var(--cursor-highlight-cyan);
+    cursor: var(--cursor-highlight-cyan) !important;
   }
   .highlite-cursor-20251028_cyan a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-cyan);
+    cursor: var(--cursor-highlight-cyan) !important;
   }
     .highlite-cursor-20251028_indigo {
-    cursor: var(--cursor-highlight-indigo);
+    cursor: var(--cursor-highlight-indigo) !important;
   }
   .highlite-cursor-20251028_indigo a {
     pointer-events: none !important;
-    cursor: var(--cursor-highlight-indigo);
+    cursor: var(--cursor-highlight-indigo) !important;
   }
 
   .text-highlight {

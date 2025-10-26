@@ -156,7 +156,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({ note, onUpdate, onDelete }) => 
         {/* Content */}
         <textarea
           ref={textareaRef}
-          className="note-area"
+          className="note-area familystyle"
           value={note.content}
           onChange={handleContentChange}
           onBlur={handleBlur}

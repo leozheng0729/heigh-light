@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import StickyNote, { type StickyNoteType, colors } from "./sticky-note";
 import TextBox, { type TextBoxType, textColors } from "./text-box";
 import HighlightManager, { styleContent } from './hight-light';
@@ -38,11 +38,7 @@ const PlasmoOverlay = () => {
   const [maxBIndex, setMaxBIndex] = useState(1);
   const [brushColor, setBrushColor] = useState(3); // 高亮颜色索引
   const [isCurrentStatus, setIsCurrentStatus] = useState<buttonStatus>(buttonStatus.other); // 当前状态
-
-  // 高亮组件
-  const highlightManager = new HighlightManager(() => {
-    setIsCurrentStatus(buttonStatus.other);
-  });
+  const highlightManager = useRef(null); // 荧光笔管理器
 
   // 清除画布
   const clearCanvas = () => {
@@ -53,7 +49,7 @@ const PlasmoOverlay = () => {
     setMaxZIndex(1);
     setMaxBIndex(1);
     setBrushColor(3);
-    highlightManager.removeAllHighlight();
+    highlightManager.current?.removeAllHighlight();
   }
   
   // 截屏函数
@@ -68,7 +64,7 @@ const PlasmoOverlay = () => {
   // 高亮
   const toggleHighlighting = () => {
     setIsCurrentStatus(buttonStatus.brush);
-    highlightManager.startHighlighting(brushColorsEn[brushColor]);
+    highlightManager.current?.startHighlighting(brushColorsEn[brushColor]);
   }
 
   // 创建便签
@@ -107,13 +103,13 @@ const PlasmoOverlay = () => {
   // 创建文本框
   const createTextBox = () => {
     setIsCurrentStatus(buttonStatus.other);
-    const randomColor = textColors[Math.floor(Math.random() * textColors.length)];
+    const randomColor = textColors[2];
     const newTextBox: StickyNoteType = {
       id: Date.now().toString(),
       content: '',
-      x: window.scrollX + 190 + (maxBIndex - 1) * 2,
+      x: window.scrollX + 290 + (maxBIndex - 1) * 2,
       y: window.scrollY + 120 + (maxBIndex - 1) * 2,
-      width: 170,
+      width: 270,
       height: 100,
       color: randomColor,
     };
@@ -171,6 +167,11 @@ const PlasmoOverlay = () => {
         // console.log(`荧光笔颜色获取：${error}`);
       }
     }
+
+    // 高亮荧光笔
+    highlightManager.current = new HighlightManager(() => {
+      setIsCurrentStatus(buttonStatus.other);
+    });
 
     // 页面已经加载完成
     const handleLoad = () => {

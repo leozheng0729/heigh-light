@@ -134,7 +134,6 @@
 }
 
 .note-area {
-  font-family: 'Comic Sans MS', cursive, sans-serif;
   font-weight: 300;
   padding: 0;
   width: 100%;
@@ -147,9 +146,14 @@
   outline: none;
   flex-grow: 1;
 }
+.familystyle {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
 .text-area {
+  margin-top: 8px;
   color: #f44336;
   font-size: 16px;
+  font-weight: 500;
 }
 
 .text-area.t-red::placeholder { color: #f44336; }
