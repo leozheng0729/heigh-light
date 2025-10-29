@@ -339,6 +339,37 @@ const PlasmoOverlay = () => {
       }
     }
 
+    // 滚动事件
+    const handleScroll = () => {
+      const bodyElement = document.body;
+      const documentElement = document.documentElement;
+      const scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+        
+        // 动态调整画布高度
+        if (scrollTop + screen.height > canvasObject.current.getHeight()) {
+            const maxHeight = Math.max(
+              bodyElement.scrollHeight, 
+              bodyElement.offsetHeight, 
+              documentElement.clientHeight, 
+              documentElement.scrollHeight, 
+              documentElement.offsetHeight
+            );
+            
+            const newHeight = canvasObject.current.getHeight() + 7500 > maxHeight ? 
+                maxHeight : canvasObject.current.getHeight() + 7500;
+            
+            if (newHeight !== canvasObject.current.getHeight()) {
+              canvasObject.current.setHeight(newHeight);
+            }
+        }
+        
+        // 检查高度限制
+        if (canvasObject.current.getHeight() > 25000) {
+            alert("Page Marker does not support pages with this height. Please try again on a different website.");
+            // exit(); // 移除页面 canvas 与 导航栏
+        }
+    }
+
     // 页面已经加载完成
     const handleLoad = () => { 
       initCanvas();
@@ -354,10 +385,12 @@ const PlasmoOverlay = () => {
     } else {
       window.addEventListener('load', handleLoad);
     }
+    window.addEventListener('scroll', handleScroll);
     initData();
     browserAPI.runtime.onMessage.addListener(handleMessage);
     return () => {
       window.removeEventListener('load', handleLoad);
+      window.removeEventListener('scroll', handleScroll);
       browserAPI.runtime.onMessage.removeListener(handleMessage);
     }
   }, [])

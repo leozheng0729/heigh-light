@@ -115,7 +115,7 @@ export const createDrawingCanvas = (
     ...fabricOptions,
     // renderOnAddRemove: false, // 减少自动重绘
     // skipOffscreen: true,      // 跳过屏幕外对象渲染
-    // enableRetinaScaling: false // 在动态调整尺寸时禁用视网膜缩放
+    enableRetinaScaling: false // 在动态调整尺寸时禁用视网膜缩放
   }
 
   // 创建画布实例
