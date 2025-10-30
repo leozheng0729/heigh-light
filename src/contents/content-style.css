@@ -142,7 +142,6 @@
   background: transparent;
   resize: none;
   color: #888;
-  min-height: 100px;
   outline: none;
   flex-grow: 1;
 }
@@ -154,6 +153,7 @@
   color: #f44336;
   font-size: 16px;
   font-weight: 500;
+  width: auto;
 }
 
 .text-area.t-red::placeholder { color: #f44336; }

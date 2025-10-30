@@ -5,7 +5,7 @@ export interface TextBoxType {
   content: string;
   x: number;
   y: number;
-  width: number;
+  minWidth: number;
   height: number;
   color: string;
   zIndex?: number;
@@ -77,12 +77,6 @@ const TextBox: React.FC<TextBoxProps> = ({ note, onUpdate, onDelete }) => {
           x: e.clientX - dragStart.x,
           y: e.clientY - dragStart.y,
         });
-      } else if (isResizing) {
-        const deltaX = e.clientX - resizeStart.x;
-        const deltaY = e.clientY - resizeStart.y;
-        onUpdate(note.id, {
-          width: Math.max(150, resizeStart.width + deltaX),
-        });
       }
     };
 
@@ -106,6 +100,13 @@ const TextBox: React.FC<TextBoxProps> = ({ note, onUpdate, onDelete }) => {
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.width = 'auto';
+      console.log(textareaRef.current.scrollWidth, 'textareaRef.current.scrollWidth')
+      textareaRef.current.style.width = `${textareaRef.current.scrollWidth}px`;
+    }
     onUpdate(note.id, { content: e.target.value });
   };
 
@@ -122,7 +123,8 @@ const TextBox: React.FC<TextBoxProps> = ({ note, onUpdate, onDelete }) => {
         padding: '10px',
         left: `${note.x}px`,
         top: `${note.y}px`,
-        width: `${note.width}px`,
+        // width: `${note.width}px`,
+        minWidth: `${note.minWidth}px`,
         height: 'auto',
         backgroundColor: 'transparent',
         zIndex: note.zIndex,
@@ -154,6 +156,7 @@ const TextBox: React.FC<TextBoxProps> = ({ note, onUpdate, onDelete }) => {
         {/* Content */}
         <textarea
           ref={textareaRef}
+          wrap="off"
           className={`note-area text-area ${textColorsClass[note.color]}`}
           value={note.content}
           onChange={handleContentChange}

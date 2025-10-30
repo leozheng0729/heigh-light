@@ -104,12 +104,12 @@ const PlasmoOverlay = () => {
   const createTextBox = () => {
     setIsCurrentStatus(buttonStatus.other);
     const randomColor = textColors[2];
-    const newTextBox: StickyNoteType = {
+    const newTextBox: TextBoxType = {
       id: Date.now().toString(),
       content: '',
       x: window.scrollX + 290 + (maxBIndex - 1) * 2,
       y: window.scrollY + 120 + (maxBIndex - 1) * 2,
-      width: 270,
+      minWidth: 150,
       height: 100,
       color: randomColor,
     };
@@ -117,8 +117,8 @@ const PlasmoOverlay = () => {
     setMaxBIndex(prev => prev + 1);
   }
 
-  // 便签-更新
-  const updateTextBox = useCallback((id: string, updates: Partial<StickyNoteType>) => {
+  // 文本-更新
+  const updateTextBox = useCallback((id: string, updates: Partial<TextBoxType>) => {
     setTextBox(prevText => {
       // 创建新数组，确保引用改变
       return prevText.map(textbox => {
@@ -128,7 +128,7 @@ const PlasmoOverlay = () => {
     });
   }, []);
 
-  // 便签-删除
+  // 文本-删除
   const deleteTextBox = useCallback((id: string) => {
     setTextBox(prevText => prevText.filter(text => text.id !== id));
   }, []);
