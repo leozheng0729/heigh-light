@@ -28,6 +28,24 @@
   line-height: 1.15;
 }
 
+.plasmo-overlay .action-arrow {
+  width: 30px;
+  height: 100%;
+  padding: 0 8px;
+  border-radius: 0;
+  margin: 0;
+}
+.plasmo-overlay .action-arrow::after {
+  position: absolute;
+  content: "";
+  background-color: #CCC;
+  width: 1px;
+  height: 40px;
+  top: 50%;
+  left: -1px;
+  transform: translateY(-50%);
+}
+
 .plasmo-overlay .plasmo-overlay-item:hover {
   background: rgba(206, 206, 215, 0.4);
 }
@@ -76,6 +94,10 @@
 .plasmo-overlay .plasmo-overlay-item svg {
   width: 30px;
   height: 30px;
+}
+.plasmo-overlay .action-arrow svg {
+  width: 30px;
+  height: 100%;
 }
 .plasmo-overlay .plasmo-overlay-item span {
   display: block;
@@ -151,8 +173,8 @@
 .text-area {
   margin-top: 8px;
   color: #f44336;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: bolder;
   width: auto;
 }
 
@@ -188,7 +210,7 @@
 .container {
   position: absolute;
   top: -130px;
-  right: -95px;
+  right: -48px;
   width: 225px;
   color: #fff;
   background-color: rgb(81, 81, 81);
