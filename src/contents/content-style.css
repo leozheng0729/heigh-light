@@ -1,4 +1,7 @@
 /* 菜单样式 */
+#pageMarker_canvas2025-wrapper-plasmo {
+  visibility: visible;
+}
 #pageMarker_canvas2025-wrapper-plasmo .plasmo-overlay {
   position: fixed;
   bottom: 20px;
@@ -14,6 +17,7 @@
   background-color: hsl(0, 0%, 99%);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  visibility: visible;
 }
 .plasmo-overlay .plasmo-overlay-item {
   position: relative;
